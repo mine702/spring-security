@@ -19,46 +19,66 @@ public class SecurityConfig {
 
     /**
      * basic formLogin()
-    Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
-                .formLogin(form -> form
-                        .loginPage("/login")
-                        .loginProcessingUrl("/loginProc")
-                        .defaultSuccessUrl("/", true)
-                        .failureUrl("/failed")
-                        .usernameParameter("userId")
-                        .passwordParameter("passwd")
-                        .successHandler((request, response, authentication) -> {
-                            log.info("authentication = {}", authentication.getName());
-                            response.sendRedirect("/home");
-                        })
-                        .failureHandler((request, response, exception) -> {
-                            log.info("exception = {}", exception.getMessage());
-                            response.sendRedirect("/login");
-                        })
-                        .permitAll()
-                );
+     Bean
+     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+     http
+     .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
+     .formLogin(form -> form
+     .loginPage("/login")
+     .loginProcessingUrl("/loginProc")
+     .defaultSuccessUrl("/", true)
+     .failureUrl("/failed")
+     .usernameParameter("userId")
+     .passwordParameter("passwd")
+     .successHandler((request, response, authentication) -> {
+     log.info("authentication = {}", authentication.getName());
+     response.sendRedirect("/home");
+     })
+     .failureHandler((request, response, exception) -> {
+     log.info("exception = {}", exception.getMessage());
+     response.sendRedirect("/login");
+     })
+     .permitAll()
+     );
 
-        return http.build();
-    }
+     return http.build();
+     }
+     */
+
+    /**
+     * rememberMe()
+     *
+     * @Bean public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
+     * http
+     * .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
+     * .formLogin(Customizer.withDefaults())
+     * .rememberMe(remeberMe -> remeberMe
+     * .alwaysRemember(true)
+     * .tokenValiditySeconds(3600)
+     * .userDetailsService(userDetailsService())
+     * .rememberMeParameter("remember")
+     * .rememberMeCookieName("remember")
+     * .key("security")
+     * );
+     * <p>
+     * return http.build();
+     * }
      */
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/anonymous").hasRole("GUEST")
+                        .requestMatchers("/anonymousContext", "/authentication").permitAll()
+                        .anyRequest()
+                        .authenticated())
                 .formLogin(Customizer.withDefaults())
-                .rememberMe(remeberMe -> remeberMe
-                        .alwaysRemember(true)
-                        .tokenValiditySeconds(3600)
-                        .userDetailsService(userDetailsService())
-                        .rememberMeParameter("remember")
-                        .rememberMeCookieName("remember")
-                        .key("security")
-                );
-
+                .anonymous(anonymous -> anonymous
+                        .principal("guest")
+                        .authorities("ROLE_GUEST")
+                )
+        ;
         return http.build();
     }
 
