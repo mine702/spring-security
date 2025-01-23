@@ -134,6 +134,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         HttpSessionRequestCache requestCache = new HttpSessionRequestCache();
+        requestCache.setMatchingRequestParameterName("customParam=y");
 
         http
                 .authorizeHttpRequests(auth -> auth
@@ -148,14 +149,15 @@ public class SecurityConfig {
                                 String redirectUrl = savedRequest.getRedirectUrl();
                                 response.sendRedirect(redirectUrl);
                             }
-                        }))
+                        })
+                ).requestCache(cache -> cache.requestCache(requestCache))
         ;
         return http.build();
     }
 
     @Bean
     public UserDetailsService userDetailsService() {
-        UserDetails user1 = User.withUsername("user1").password("{noop}1111").roles("USER").build();
+        UserDetails user1 = User.withUsername("user").password("{noop}1111").roles("USER").build();
         return new InMemoryUserDetailsManager(user1);
     }
 }
