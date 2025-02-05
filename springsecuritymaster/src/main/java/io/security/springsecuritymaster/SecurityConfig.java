@@ -173,7 +173,27 @@ public class SecurityConfig {
      return http.build();
      }
      */
-    
+
+    /**
+     인증
+
+     @Bean public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
+     HttpSessionRequestCache requestCache = new HttpSessionRequestCache();
+     requestCache.setMatchingRequestParameterName("customParam=y");
+
+     http
+     .authorizeHttpRequests(
+     auth -> auth
+     .requestMatchers("/logoutSuccess").permitAll()
+     .anyRequest().authenticated())
+     .formLogin(Customizer.withDefaults())
+     .httpBasic(Customizer.withDefaults())
+     .userDetailsService(userDetailsService());
+     return http.build();
+     }
+     */
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
@@ -185,9 +205,8 @@ public class SecurityConfig {
                         auth -> auth
                                 .requestMatchers("/logoutSuccess").permitAll()
                                 .anyRequest().authenticated())
-                .formLogin(Customizer.withDefaults())
-                .httpBasic(Customizer.withDefaults())
-                .userDetailsService(userDetailsService());
+                .formLogin(Customizer.withDefaults()
+                );
         return http.build();
     }
 
